@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="金魚智囊團">
+<meta name="theme-color" content="#071D1F">
+<title>金魚智囊團</title>
+<style>
+:root{
+  --ink:#071D1F;--ink2:#0D2C2D;--ink3:#153E3D;--line:#1D5250;
+  --gold:#F5A524;--coral:#FF6B4A;--teal:#5FD6C4;--violet:#B39DFF;
+  --lime:#B8E24A;--sky:#78C6F0;--rose:#FF9EC4;
+  --txt:#EFEAE1;--mute:#87A6A3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;background:var(--ink);color:var(--txt);
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  padding-bottom:92px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+.head{padding:22px 0 14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.logo{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.logo span{color:var(--gold)}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--mute)}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:15px;font-weight:700}
+label.fl{display:block;font-size:12px;color:var(--mute);margin:12px 0 6px;letter-spacing:.04em}
+label.fl:first-child{margin-top:0}
+input.fi,textarea.fi{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;
+  color:var(--txt);padding:11px 12px;font-size:16px;font-family:inherit;line-height:1.55}
+textarea.fi{resize:vertical}
+input.fi:focus,textarea.fi:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
+  background:var(--gold);color:#08201F;border:none;border-radius:11px;padding:14px;
+  font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+.btn:disabled{opacity:.45}
+.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+.btn.sm{width:auto;padding:9px 15px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;
+  color:var(--mute);font-size:13px;font-family:inherit;cursor:pointer}
+.chip.on{background:var(--gold);color:#08201F;border-color:var(--gold);font-weight:700}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumb{position:relative;width:68px;height:68px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;
+  border:none;background:rgba(7,29,31,.85);color:var(--txt);font-size:12px;cursor:pointer;line-height:1}
+.stamp{width:30px;height:30px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#08201F}
+.t-gold{background:var(--gold)}.t-teal{background:var(--teal)}.t-coral{background:var(--coral)}
+.t-violet{background:var(--violet)}.t-lime{background:var(--lime)}.t-sky{background:var(--sky)}.t-rose{background:var(--rose)}
+.spine{border-left:2px solid var(--line);margin-left:14px;padding-left:18px}
+.speaker{display:flex;align-items:center;gap:10px;margin:0 0 8px -33px}
+.speaker b{font-size:14px}
+.say{font-size:15px;line-height:1.85;margin:0 0 18px;white-space:pre-wrap;word-break:break-word}
+.fact,.guess{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:5px;margin-right:6px}
+.fact{background:var(--gold);color:#08201F}
+.guess{border:1px dashed var(--mute);color:var(--mute)}
+.post{background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:14px;
+  font-size:15px;line-height:1.95;white-space:pre-wrap;word-break:break-word}
+.meta{font-size:12.5px;color:var(--mute);line-height:1.7}
+.slot{border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px}
+.slot b{font-size:17px;color:var(--gold)}
+.err{background:#3A1512;border:1px solid var(--coral);color:#FFC7B9;border-radius:10px;
+  padding:11px 13px;font-size:13.5px;line-height:1.6;margin-bottom:12px}
+.ok{background:#123024;border:1px solid var(--lime);color:#D9F2A8;border-radius:10px;
+  padding:11px 13px;font-size:13.5px;line-height:1.6;margin-bottom:12px}
+.empty{color:var(--mute);font-size:13.5px;line-height:1.75;text-align:center;padding:22px 8px}
+.rec{border-bottom:1px solid var(--line);padding:12px 0}
+.rec:last-child{border-bottom:none}
+.rec-t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.rec-t b{font-size:14px;line-height:1.5}
+.rec-x{background:none;border:none;color:var(--mute);cursor:pointer;font-size:12px;padding:2px 4px}
+.mtag{display:inline-block;background:var(--ink3);border-radius:6px;padding:3px 8px;font-size:12.5px;margin:6px 6px 0 0}
+.mtag b{color:var(--gold)}
+.load{display:flex;align-items:center;gap:9px;color:var(--mute);font-size:13.5px;padding:8px 0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:bl 1s infinite}
+@keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink2);border-top:1px solid var(--line);
+  display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20}
+nav button{flex:1;background:none;border:none;color:var(--mute);font-family:inherit;font-size:11px;
+  padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+nav button.on{color:var(--gold)}
+nav em{font-style:normal;font-size:19px;line-height:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="logo">金魚<span>智囊團</span></div>
+    <div class="eyebrow" id="eyebrow"></div>
+  </div>
+  <div id="app"></div>
+</div>
+<nav id="nav"></nav>
+
+<script>
+/* ==================== 設定 ==================== */
+const WORKER_URL = "https://goldfish-api.luegg5511.workers.dev/";
+const MODEL = "claude-sonnet-4-6";
+
+const DEFAULT_BRAND = {
+  name: "金魚數位音樂",
+  ig: "goldfish_2011",
+  services: "客製化歌曲、翻唱錄音製作、MV 拍攝（錄音＋MV 可一次完成）",
+  notes: "2026 年 7 月啟用新攝影棚，錄音和 MV 可以在同一天一次完成。",
+  tagCount: 5,
+  style: `語氣熱血口語，不要文青散文。
+常用雙驚嘆號「！！」、句尾「啦」「啊」「～～」、emoji 連發。
+句子不要短促標語，要有連接詞把話講完整。
+愛用三詞並列，並列之後直接接主詞開講，不一定要用「再加上」。
+重點放在歌曲和作品本身，不要寫成描述現場空氣的散文。
+錄音類貼文不要用「全都拍得到」這種拍攝取景的講法，那是 MV 貼文才用。
+CTA 慣用句：「歡迎私訊我聊聊👉」，CTA 那行之後直接接 hashtag，中間不要空行。`,
+  sample: `主題曲主唱錄製，完成！！
+
+高音、情緒、口氣，白老師一開嗓，整個歌曲真的都不一樣了😍😍😍
+
+耳機一戴、站到麥克風前，屏息專注的唱著每一句✨✨
+
+這次的主題曲真的不好唱，果然還是要白老師的高音才駕馭得住啊！！整整奮鬥了 7 個小時，一句一句磨到滿意才收工～
+
+接下來就進入後製期啦，等成品出來一定會讓大家嚇一跳～
+
+敬請期待啦🎬🎬
+
+想讓自己的歌被好好錄下來，歡迎私訊我聊聊👉
+#錄音室 #人聲錄音 #客製化歌曲 #音樂製作 #錄音日常`,
+  gear: [{
+    name: "Manley Reference Gold 真空管麥克風",
+    cue: "畫面裡出現金色機身的電容式麥克風，金色網罩、金屬光澤，通常掛在避震架上、前面有一片黑色防噴罩",
+    pitch: "美國 Manley 手工打造的頂級真空管麥克風，台灣的錄音室很少見得到，人聲的厚度跟空氣感是它出名的地方",
+    rate: 0.2
+  }]
+};
+
+const NO_PLACEHOLDER = `貼文成品會被直接複製貼上，所以絕對不能出現任何佔位符號、方括號、或需要老闆自己填的空格。
+不確定的資訊，像是歌名、客戶名、日期、價格，不要留空格請人填，改寫成不需要確認的說法，例如「這次的作品」「這回的客人」，或直接把那句省略。`;
+
+const FACT_RULE = `每一句話開頭必須標【事實】或【推測】。
+【事實】只能用在「已知數據」區塊裡真的出現的數字、或使用者這次自己輸入的內容。
+其他任何判斷、通則、經驗法則，一律標【推測】。
+如果「已知數據」是空的，就直說目前沒有本帳號數據，接下來講的都是【推測】。不可以自己編數字。`;
+
+const POST_TYPES = [
+  { key:"view", label:"錄音師觀點", goal:"引來留言。不需要新作品，靠的是老闆自己的專業判斷。",
+    guide:`從一個具體的錄音現場觀察出發，講一個一般人沒想過、甚至有點反直覺的判斷。
+不要套用「完成！！」的標準結構，開頭直接進觀察。
+結尾不要推銷，改成一句真的想聽答案的問句，邀請大家留言。` },
+  { key:"making", label:"製作中", goal:"讓當事的歌手或客戶自己轉發到他的限動。",
+    guide:`一定要有明確的主角：這次唱的人、老師、學校或客戶。
+寫他今天做到了什麼、這首歌對他的意義、他卡在哪一句又怎麼過關的。
+主角看了要覺得有面子、想轉發，這是成敗標準。
+沒有提供名字就用「今天的歌手」帶過，不要留空格等人填。` },
+  { key:"work", label:"作品發表", goal:"一週最重要的一篇，目標是被轉出去、被沒追蹤的人看到。",
+    guide:`成品本身是主角。寫這首歌是誰的、寫給誰、當初卡在哪裡、現在完成了。
+結尾明確叫大家去聽完整版，不要只寫敬請期待。
+情緒放到最滿，這是慶祝，不是流程紀錄。` },
+  { key:"voice", label:"客人的話", goal:"讓客人自己轉發。",
+    guide:`客人說的話是主體，完整呈現，不要改寫成老闆的口吻。
+老闆自己的回應只佔最後兩三句，語氣是感謝，不要蓋過客人。
+不推銷服務，結尾收得低調，CTA 可以省略。` }
+];
+
+const ROLES = [
+  { key:"insight", ch:"洞", name:"洞察官", tint:"gold", job:"從已知數據裡找出模式與異常，指出哪些是真訊號、哪些只是巧合。不做創意發想。" },
+  { key:"strategy", ch:"策", name:"策略官", tint:"teal", job:"看定位與取捨：該被記住的是什麼，資源押在哪，什麼該砍掉。講清楚機會成本。" },
+  { key:"content", ch:"文", name:"內容官", tint:"coral", job:"想題材、鉤子與系列企劃。給具體到明天就能拍的點子。" },
+  { key:"sales", ch:"業", name:"業務官", tint:"sky", job:"看詢問到成交這條路：貼文有沒有下一步、報價怎麼開口、怎麼把私訊變訂單。給可以照著講的話術。" },
+  { key:"risk", ch:"險", name:"風控官", tint:"violet", job:"抓風險：音樂與影像版權、平台規則、誇大承諾、客訴引信。直接指出哪一句會惹麻煩。" },
+  { key:"new", ch:"新", name:"創新官", tint:"rose", job:"提還沒人在做的格式、拍法與方案組合。要說清楚為什麼現在做得起來。" },
+  { key:"ops", ch:"行", name:"執行官", tint:"lime", job:"把方向拆成本週做得完的步驟，標出誰做、要多久、先後順序。不談願景。" }
+];
+const DEFAULT_ROLE_KEYS = ["insight","strategy","content","sales","ops"];
+
+/* ==================== 工具 ==================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const S = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+
+async function callOnce(system, messages, maxTokens){
+  const res = await fetch(WORKER_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ model: MODEL, max_tokens: maxTokens || 1600, system, messages })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (data.error) throw new Error(data.error.message || "API 回傳錯誤");
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const text = (data.content || []).map(b => b.type === "text" ? b.text : "").filter(Boolean).join("\n").trim();
+  if (!text) throw new Error("模型沒有回傳內容");
+  return text;
+}
+
+async function callClaude(system, messages, maxTokens, tries){
+  tries = tries || 2;
+  let last;
+  for (let i = 0; i < tries; i++){
+    try { return await callOnce(system, messages, maxTokens); }
+    catch(e){ last = e; if (i < tries - 1) await new Promise(r => setTimeout(r, 2500)); }
+  }
+  throw last;
+}
+
+function parseJSON(t){
+  const c = String(t).replace(/```json/gi,"").replace(/```/g,"").trim();
+  const s = c.indexOf("{"), e = c.lastIndexOf("}");
+  return JSON.parse(s >= 0 && e > s ? c.slice(s, e+1) : c);
+}
+function safeJSON(t, fb){ try { return parseJSON(t); } catch(e){ return fb; } }
+
+function tagged(text){
+  return String(text || "").split(/(【事實】|【推測】)/g).map(p =>
+    p === "【事實】" ? '<span class="fact">事實</span>' :
+    p === "【推測】" ? '<span class="guess">推測</span>' : esc(p)
+  ).join("");
+}
+
+function copyText(t){
+  const ta = document.createElement("textarea");
+  ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+function fileToBlock(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("圖片讀取失敗"));
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("圖片格式不支援"));
+      img.onload = () => {
+        const sc = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        const url = c.toDataURL("image/jpeg", quality);
+        resolve({ block:{ type:"image", source:{ type:"base64", media_type:"image/jpeg", data:url.split(",")[1] } }, preview:url });
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function digest(list){
+  if (!list.length) return "（目前沒有任何已存的成效數據）";
+  return list.slice(0,14).map(r => {
+    const m = (r.metrics||[]).map(x => x.label + " " + x.value).join("、");
+    return "・" + (r.date||"日期不明") + "｜" + (r.platform||"") + "｜" + (r.kind||"") + "｜" + (r.title||"") + "｜" + m;
+  }).join("\n");
+}
+function brandBlock(b){ return "品牌：" + b.name + "（IG：" + b.ig + "）\n服務：" + b.services + "\n補充：" + b.notes; }
+
+/* ==================== 狀態 ==================== */
+const st = {
+  tab: "post",
+  brand: Object.assign({}, DEFAULT_BRAND, S.get("gf:brand", {})),
+  insights: S.get("gf:insights", []),
+  meetings: S.get("gf:meetings", []),
+  posts: S.get("gf:posts", []),
+  roleKeys: S.get("gf:roles", DEFAULT_ROLE_KEYS),
+  post: { topic:"", gist:"", platform:"IG", ptype:"making", forceGear:false, images:[], out:null, busy:"", err:"" },
+  ins: { images:[], draft:null, busy:"", err:"" },
+  meet: { q:"", says:[], conv:"", busy:"", err:"" },
+  log: { open:"brand", diag:[], diagBusy:false, saved:false }
+};
+
+/* ==================== 文案提示 ==================== */
+function buildCopySystem(brand, pt, picked){
+  const gear = picked.length ? `
+「這一篇要帶到的招牌器材」
+${picked.map(g => g.name + "：" + g.pitch).join("\n")}
+用一到兩句自然帶進貼文，講它為什麼特別、對聲音的差別在哪，不要列規格、不要放連結、不要變成整篇主題。
+` : "";
+  return `你是「${brand.name}」的文案官，寫的是老闆本人會直接複製貼上發出去的貼文。
+${gear}
+「這一篇的類型：${pt.label}」
+目標：${pt.goal}
+寫法：
+${pt.guide}
+這段類型寫法優先度最高，跟其他規則衝突時聽這一段。
+
+「模仿下面這篇範本」
+這是老闆親自改過、他認可的貼文。語氣、斷行、標點、emoji 的位置照這個模仿，但不要抄內容。
+---
+${brand.sample}
+---
+
+「語氣規則」
+${brand.style}
+
+「硬性規定」
+${NO_PLACEHOLDER}
+只寫「照片裡有什麼」和「內容概要」提到的東西，其他畫面細節不要編。
+不要承諾價格、檔期、名次或任何做不到的事。
+hashtag 只能 ${brand.tagCount} 個，全部用中文，不要英文、不要品牌名。
+hashtag 寫在同一行，接在最後一行的下一行，中間不空行。
+
+只輸出 JSON，不要開場白或 markdown：
+{"a":"版本一完整貼文正文，含換行，不含 hashtag","b":"版本二，換個開頭與節奏","hashtags":"${brand.tagCount} 個中文 hashtag，用空白分隔"}`;
+}
+
+/* ==================== 產貼文 ==================== */
+async function runPost(){
+  const p = st.post;
+  if (!p.topic.trim() && !p.images.length){ p.err = "至少給一個貼文主題，或放一張圖片。"; render(); return; }
+  p.err = ""; p.out = null; p.busy = "看圖"; render();
+  let step = "看圖";
+  try {
+    let scene = "這次沒有附圖片。", seen = [], sceneFailed = false;
+    const gearList = (st.brand.gear || []).filter(g => g && g.name);
+    if (p.images.length){
+      const ask = gearList.length ? "\n\n另外檢查以下器材有沒有出現在畫面裡：\n" +
+        gearList.map(g => "・" + g.name + "：" + g.cue).join("\n") + "\n只有真的看到才算。" : "";
+      try {
+        const raw = await callClaude(
+          `你是攝影助理。用繁體中文描述這幾張照片裡真的看得到的東西：人在做什麼、用什麼器材、場景、光線。只描述看得到的，不要猜歌名人名，不超過兩百字。${ask}
+
+只輸出 JSON：{"scene":"照片描述","gear":["確實看到的器材名稱，沒有就空陣列"]}`,
+          [{ role:"user", content:[{type:"text",text:"描述這些照片。"}].concat(p.images.slice(0,3).map(i => i.block)) }],
+          1000
+        );
+        const j = safeJSON(raw, { scene: raw, gear: [] });
+        scene = j.scene || raw;
+        seen = Array.isArray(j.gear) ? j.gear : [];
+      } catch(e){
+        sceneFailed = true;
+        scene = "（這次讀不到照片，只能依主題和內容概要來寫，不要描述任何畫面細節。）";
+      }
+    }
+
+    const detected = (sceneFailed && p.forceGear) ? gearList
+      : gearList.filter(g => seen.some(s => String(s).includes(g.name) || g.name.includes(String(s))));
+    const picked = detected.filter(g => p.forceGear || Math.random() < (Number(g.rate) || 0.2));
+
+    const pt = POST_TYPES.find(t => t.key === p.ptype) || POST_TYPES[1];
+    const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights) +
+      "\n\n「這次要發的」\n平台：" + p.platform + "\n貼文類型：" + pt.label + "\n目標：" + pt.goal +
+      "\n主題：" + (p.topic || "（沒有指定，依照片判斷）") + "\n內容概要：" + (p.gist || "（沒有提供）") +
+      "\n\n「照片裡有什麼」\n" + scene;
+
+    let brief = {
+      slots:[{ when:"平日 20:00 前後", reason:"【推測】還沒有你自己的成效數據，這是一般通則。" },
+             { when:"週末 12:00 前後", reason:"【推測】同上，存了成效數據之後才會變成事實。" }],
+      evidence:["【推測】目前沒有成效數據，角度是照題材通則抓的。"]
+    };
+    if (st.insights.length){
+      step = "洞察官"; p.busy = "洞察官"; render();
+      brief = safeJSON(await callClaude(
+        `你是「${st.brand.name}」的洞察官，負責在寫文案前定調。
+${FACT_RULE}
+只輸出 JSON：{"angle":"最該切的角度，一句話","hooks":["三個開頭候選"],"slots":[{"when":"週三 20:30","reason":"以【事實】或【推測】開頭"}],"evidence":["三到五句，每句以【事實】或【推測】開頭"]}
+slots 給兩個時段，具體到星期幾＋幾點幾分。`,
+        [{ role:"user", content: ctx }], 1200), brief);
+    }
+
+    step = "文案官"; p.busy = "文案官"; render();
+    const sys = buildCopySystem(st.brand, pt, picked);
+    const userMsg = ctx + "\n\n洞察官定的角度：" + (brief.angle || "（沒有特別指定）") +
+      "\n建議開頭候選：" + ((brief.hooks || []).join(" ／ "));
+    const raw = await callClaude(sys, [{ role:"user", content: userMsg }], 2000);
+    const copy = safeJSON(raw, { a: raw, b:"", hashtags:"" });
+
+    p.out = Object.assign({
+      id: Date.now(), at: new Date().toISOString(),
+      topic: p.topic || "（依照片產生）", platform: p.platform, ptype: pt.label,
+      gearSeen: detected.map(g => g.name), gearUsed: picked.map(g => g.name),
+      sceneFailed: sceneFailed, _sys: sys, _ctx: userMsg
+    }, brief, copy);
+    st.posts = [p.out].concat(st.posts).slice(0, 60);
+    S.set("gf:posts", st.posts);
+    p.busy = ""; render();
+  } catch(e){
+    p.busy = "";
+    p.err = "在「" + step + "」這一步失敗了：" + e.message;
+    render();
+  }
+}
+
+async function rewritePost(){
+  const p = st.post;
+  if (!p.out) return;
+  p.busy = "重寫"; p.err = ""; render();
+  try {
+    const raw = await callClaude(p.out._sys, [{ role:"user",
+      content: p.out._ctx + "\n\n上一版是這樣寫的，這次換一個開頭、換一個節奏，不要重複：\n---\n" + p.out.a + "\n---" }], 2000);
+    const c = safeJSON(raw, { a: raw, b: p.out.b, hashtags: p.out.hashtags });
+    Object.assign(p.out, c);
+    p.busy = ""; render();
+  } catch(e){ p.busy = ""; p.err = "重寫失敗：" + e.message; render(); }
+}
+
+/* ==================== 讀成效 ==================== */
+async function runInsight(){
+  const s = st.ins;
+  if (!s.images.length){ s.err = "先放一張後台截圖。"; render(); return; }
+  s.err = ""; s.draft = null; s.busy = "讀取"; render();
+  try {
+    const raw = await callClaude(
+      `你是社群數據判讀員。使用者上傳 FB / IG / Threads 後台洞察或廣告管理員截圖。
+只把畫面上真的看得到的數字讀出來。看不清楚或沒出現的欄位不要寫進去，絕對不要推估。
+只輸出 JSON：{"platform":"IG 或 FB 或 Threads 或 廣告","kind":"貼文成效 或 帳號洞察 或 廣告成效","date":"YYYY-MM-DD 或 null","title":"這筆是什麼的一句話","metrics":[{"label":"讚","value":"128"}],"notes":"","unreadable":[]}`,
+      [{ role:"user", content:[{type:"text",text:"讀這些截圖。"}].concat(s.images.map(i => i.block)) }], 1500);
+    const r = safeJSON(raw, null);
+    if (!r) throw new Error("讀不出結構化數字");
+    r.id = Date.now();
+    r.date = r.date || new Date().toISOString().slice(0,10);
+    s.draft = r; s.busy = ""; render();
+  } catch(e){ s.busy = ""; s.err = "讀不出來：" + e.message + "。截圖裁掉多餘部分、放大數字區域會好很多。"; render(); }
+}
+
+/* ==================== 開會 ==================== */
+async function runMeeting(){
+  const m = st.meet;
+  if (!m.q.trim()){ m.err = "先寫下你想問的問題。"; render(); return; }
+  m.err = ""; m.says = []; m.conv = "";
+  const panel = ROLES.filter(r => st.roleKeys.includes(r.key));
+  const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights) + "\n\n「老闆的問題」\n" + m.q;
+  try {
+    for (const r of panel){
+      m.busy = r.name; render();
+      const text = await callClaude(
+        `你是「${st.brand.name}」智囊團的${r.name}。
+職責：${r.job}
+${FACT_RULE}
+只講三到五點，每點一到兩句，各自獨立一行，開頭一定是【事實】或【推測】。
+不要標題、不要編號、不要客套。講繁體中文（台灣用語）。`,
+        [{ role:"user", content: ctx }], 1200);
+      m.says.push({ role:r, lines: text.split("\n").map(x => x.trim()).filter(Boolean) });
+      render();
+    }
+    m.busy = "收斂"; render();
+    const merged = m.says.map(c => "【" + c.role.name + "】\n" + c.lines.join("\n")).join("\n\n");
+    m.conv = await callClaude(
+      `你是會議主席，把 ${panel.length} 位顧問的意見收斂。
+${FACT_RULE}
+只給 2 到 3 個方向，每個照這個結構，中間空一行：
+方向一：一句話標題
+為什麼：一句，開頭標【事實】或【推測】
+先做什麼：一到三個動作，一行一個
+怎麼知道有效：一個看得到的指標
+不要開場白、不要總結段。講繁體中文。`,
+      [{ role:"user", content: ctx + "\n\n「顧問們的意見」\n" + merged }], 1600);
+    st.meetings = [{ id:Date.now(), at:new Date().toISOString(), q:m.q, says:m.says, conv:m.conv }].concat(st.meetings).slice(0,40);
+    S.set("gf:meetings", st.meetings);
+    m.busy = ""; render();
+  } catch(e){ m.busy = ""; m.err = "開會中斷：" + e.message + "。已講完的還在下面，可以重按接著跑。"; render(); }
+}
+
+/* ==================== 診斷 ==================== */
+async function runDiag(){
+  st.log.diag = []; st.log.diagBusy = true; render();
+  const filler = "這是一段測試用的中文句子，用來確認長度會不會造成問題。".repeat(45);
+  const probes = [
+    { name:"1. 短文字", sys:"你是助理。", msg:"回覆 OK 兩個字。" },
+    { name:"2. 短文字＋表情符號", sys:"你是助理。😍😍😍 ✨✨ 🎬🎬", msg:"回覆 OK 兩個字。" },
+    { name:"3. 長文字", sys:"你是助理。" + filler, msg:"回覆 OK 兩個字。" },
+    { name:"4. 帶入貼文範本", sys:"你是助理。範本：\n" + st.brand.sample, msg:"回覆 OK 兩個字。" },
+    { name:"5. 要求輸出 JSON", sys:'你是助理。只輸出 JSON：{"a":"OK"}', msg:"照格式回覆。" }
+  ];
+  for (const p of probes){
+    try { await callClaude(p.sys, [{ role:"user", content:p.msg }], 100, 1);
+      st.log.diag.push({ name:p.name, ok:true, note:p.sys.length + " 字" }); }
+    catch(e){ st.log.diag.push({ name:p.name, ok:false, note:p.sys.length + " 字 ｜ " + e.message }); }
+    render();
+    await new Promise(r => setTimeout(r, 700));
+  }
+  st.log.diagBusy = false; render();
+}
+
+/* ==================== 畫面 ==================== */
+function imagePicker(kind, hint, max){
+  const arr = kind === "post" ? st.post.images : st.ins.images;
+  return '<button class="btn ghost sm" data-act="pick" data-kind="' + kind + '">＋ 選圖片</button>' +
+    '<span class="meta" style="margin-left:10px">' + esc(hint) + '</span>' +
+    '<input type="file" accept="image/*" multiple style="display:none" id="file-' + kind + '">' +
+    '<div class="thumbs">' + arr.map((im,i) =>
+      '<div class="thumb"><img src="' + im.preview + '"><button data-act="unpick" data-kind="' + kind + '" data-i="' + i + '">×</button></div>'
+    ).join("") + '</div>';
+}
+
+function viewPost(){
+  const p = st.post, b = st.brand;
+  const pt = POST_TYPES.find(t => t.key === p.ptype) || POST_TYPES[1];
+  let h = '<div class="card"><h3>這次要發什麼</h3>';
+  h += '<label class="fl">平台</label><div class="row">' +
+    ["IG","Threads","FB"].map(x => '<button class="chip' + (p.platform===x?' on':'') + '" data-act="plat" data-v="' + x + '">' + x + '</button>').join("") + '</div>';
+  h += '<label class="fl">題材</label><div class="row">' +
+    POST_TYPES.map(t => '<button class="chip' + (p.ptype===t.key?' on':'') + '" data-act="ptype" data-v="' + t.key + '">' + t.label + '</button>').join("") +
+    '</div><div class="meta" style="margin-top:8px">' + esc(pt.goal) + '</div>';
+  h += '<label class="fl">貼文主題</label><input class="fi" id="f-topic" value="' + esc(p.topic) + '" placeholder="例：新人的專屬對唱歌曲，主唱錄製完成">';
+  h += '<label class="fl">內容概要</label><textarea class="fi" id="f-gist" rows="4" placeholder="越具體越好，越像你講話越好">' + esc(p.gist) + '</textarea>';
+  h += '<label class="fl">貼文圖片</label>' + imagePicker("post","最多 3 張", 3);
+  if ((b.gear||[]).length){
+    h += '<div style="height:10px"></div><button class="chip' + (p.forceGear?' on':'') + '" data-act="force">' +
+      (p.forceGear?'✓ ':'') + '這次一定要寫到招牌器材</button>' +
+      '<div class="meta" style="margin-top:8px">不勾的話，只要照片裡有拍到，就照設定機率隨機決定。</div>';
+  }
+  h += '<div style="height:16px"></div><button class="btn" data-act="gen"' + (p.busy?' disabled':'') + '>' + (p.busy?'產生中…':'產生貼文') + '</button>';
+  if (p.busy) h += '<div class="load"><span class="dot"></span>' + esc(p.busy) + '進行中…</div>';
+  h += '</div>';
+
+  if (p.err) h += '<div class="err">' + esc(p.err) + '</div>';
+
+  if (p.out){
+    const o = p.out;
+    if (o.sceneFailed) h += '<div class="err">這次讀不到照片，貼文是照你寫的主題和內容概要生出來的。</div>';
+    h += '<div class="card"><h3>建議發文時間</h3>' +
+      (o.slots||[]).map(s => '<div class="slot"><b>' + esc(s.when) + '</b><div style="margin-top:6px"><p class="say" style="margin:0">' + tagged(s.reason) + '</p></div></div>').join("");
+    if ((o.gearSeen||[]).length) h += '<div class="meta" style="margin-top:10px">照片裡有拍到 ' + esc(o.gearSeen.join("、")) + '，' + ((o.gearUsed||[]).length?'這次有寫進貼文。':'這次沒抽中，所以沒寫進去。') + '</div>';
+    h += '</div>';
+    [["a","版本一"],["b","版本二"]].forEach(([k,label]) => {
+      if (!o[k]) return;
+      h += '<div class="card"><h3>' + label + '</h3><div class="post">' + esc(o[k]) + '</div>' +
+        '<div style="height:10px"></div><div class="post" style="color:var(--teal)">' + esc(o.hashtags) + '</div>' +
+        '<div style="height:12px"></div><div class="row">' +
+        '<button class="btn ghost sm" data-act="copy" data-k="' + k + '">複製貼文＋hashtag</button>' +
+        (k==="a" ? '<button class="btn ghost sm" data-act="rewrite"' + (p.busy?' disabled':'') + '>換個寫法</button>' : '') +
+        '</div></div>';
+    });
+    if ((o.evidence||[]).length){
+      h += '<div class="card"><h3>洞察官的依據</h3>' + o.evidence.map(e => '<p class="say">' + tagged(e) + '</p>').join("") + '</div>';
+    }
+  }
+  return h;
+}
+
+function viewIns(){
+  const s = st.ins;
+  let h = '<div class="card"><h3>丟後台截圖進來</h3>' +
+    '<div class="meta" style="margin-bottom:12px">IG 洞察、FB 粉專、Threads 分析、廣告管理員都可以。圖片只讀不存，只留下數字。</div>' +
+    imagePicker("ins","一次一到兩張最穩", 2) +
+    '<div style="height:16px"></div><button class="btn" data-act="readins"' + (s.busy?' disabled':'') + '>' + (s.busy?'讀取中…':'讀出數字') + '</button>';
+  if (s.busy) h += '<div class="load"><span class="dot"></span>正在讀截圖上的數字…</div>';
+  h += '</div>';
+  if (s.err) h += '<div class="err">' + esc(s.err) + '</div>';
+  if (s.draft){
+    const d = s.draft;
+    h += '<div class="card"><h3>讀到這些，對嗎</h3>' +
+      '<label class="fl">這筆資料是什麼</label><input class="fi" id="d-title" value="' + esc(d.title||"") + '">' +
+      '<label class="fl">日期</label><input class="fi" id="d-date" value="' + esc(d.date||"") + '">' +
+      '<label class="fl">數字</label><div>' +
+      ((d.metrics||[]).map(m => '<span class="mtag">' + esc(m.label) + ' <b>' + esc(m.value) + '</b></span>').join("") || '<div class="meta">沒讀到數字，換一張更清楚的截圖。</div>') +
+      '</div><div style="height:16px"></div><div class="row">' +
+      '<button class="btn sm" data-act="saveins">存起來</button>' +
+      '<button class="btn ghost sm" data-act="dropins">丟掉</button></div></div>';
+  }
+  h += '<div class="card"><h3>已存 ' + st.insights.length + ' 筆</h3>';
+  if (!st.insights.length) h += '<div class="empty">還沒有數據。存越多筆，顧問講話就越少「推測」、越多「事實」。</div>';
+  h += st.insights.map(r => '<div class="rec"><div class="rec-t"><b>' + esc(r.title||"未命名") + '</b>' +
+    '<button class="rec-x" data-act="delins" data-id="' + r.id + '">刪除</button></div>' +
+    '<div class="meta">' + esc(r.date) + ' ｜ ' + esc(r.platform||"") + ' ｜ ' + esc(r.kind||"") + '</div><div>' +
+    (r.metrics||[]).map(m => '<span class="mtag">' + esc(m.label) + ' <b>' + esc(m.value) + '</b></span>').join("") + '</div></div>').join("");
+  return h + '</div>';
+}
+
+function viewMeet(){
+  const m = st.meet;
+  let h = '<div class="card"><h3>這場會誰進來</h3><div class="row">' +
+    ROLES.map(r => '<button class="chip' + (st.roleKeys.includes(r.key)?' on':'') + '" data-act="role" data-v="' + r.key + '">' + r.ch + '　' + r.name + '</button>').join("") +
+    '</div><div class="meta" style="margin-top:10px">點一下加入或請出去。選 4 到 5 個剛好。</div></div>';
+  h += '<div class="card"><h3>把問題丟進來</h3>' +
+    '<textarea class="fi" id="m-q" rows="4" placeholder="例：新攝影棚的貼文都很低，該怎麼救？">' + esc(m.q) + '</textarea>' +
+    '<div style="height:14px"></div><button class="btn" data-act="meet"' + (m.busy?' disabled':'') + '>' + (m.busy?'會議進行中…':'開會') + '</button>';
+  if (m.busy) h += '<div class="load"><span class="dot"></span>' + esc(m.busy) + '發言中…</div>';
+  if (!st.insights.length) h += '<div class="meta" style="margin-top:10px">目前沒有成效數據，這場會五個人講的都會是推測。</div>';
+  h += '</div>';
+  if (m.err) h += '<div class="err">' + esc(m.err) + '</div>';
+  if (m.says.length){
+    h += '<div class="card"><div class="eyebrow" style="margin-bottom:14px">會議記錄</div><div class="spine">' +
+      m.says.map(s => '<div><div class="speaker"><span class="stamp t-' + s.role.tint + '">' + s.role.ch + '</span><b>' + s.role.name + '</b></div>' +
+        s.lines.map(l => '<p class="say">' + tagged(l) + '</p>').join("") + '</div>').join("") + '</div></div>';
+  }
+  if (m.conv){
+    h += '<div class="card" style="border-color:var(--gold)"><h3>收斂後的方向</h3><p class="say">' + tagged(m.conv) + '</p>' +
+      '<button class="btn ghost sm" data-act="copyconv">複製結論</button></div>';
+  }
+  return h;
+}
+
+function viewLog(){
+  const L = st.log, b = st.brand;
+  let h = '<div class="row" style="margin-bottom:14px">' +
+    [["brand","品牌設定"],["meet","會議 " + st.meetings.length],["post","貼文 " + st.posts.length],["diag","診斷"]]
+      .map(([k,l]) => '<button class="chip' + (L.open===k?' on':'') + '" data-act="logtab" data-v="' + k + '">' + l + '</button>').join("") + '</div>';
+
+  if (L.open === "brand"){
+    h += '<div class="card"><h3>顧問們認識的你</h3>' +
+      '<label class="fl">品牌名稱</label><input class="fi" id="b-name" value="' + esc(b.name) + '">' +
+      '<label class="fl">IG 帳號</label><input class="fi" id="b-ig" value="' + esc(b.ig) + '">' +
+      '<label class="fl">服務項目</label><textarea class="fi" id="b-services" rows="2">' + esc(b.services) + '</textarea>' +
+      '<label class="fl">近期重點</label><textarea class="fi" id="b-notes" rows="2">' + esc(b.notes) + '</textarea>' +
+      '<label class="fl">hashtag 數量</label><input class="fi" id="b-tag" type="number" value="' + esc(b.tagCount) + '">' +
+      '<label class="fl">貼文語氣規則</label><textarea class="fi" id="b-style" rows="8">' + esc(b.style) + '</textarea>' +
+      '<label class="fl">模仿範本</label><div class="meta" style="margin-bottom:6px">手改完一篇滿意的，就貼進來換掉舊的，文案官會越寫越像你。</div>' +
+      '<textarea class="fi" id="b-sample" rows="14">' + esc(b.sample) + '</textarea>';
+    (b.gear||[]).forEach((g,i) => {
+      h += '<label class="fl">招牌器材 ' + (i+1) + '</label><div class="slot">' +
+        '<input class="fi" data-g="name" data-i="' + i + '" value="' + esc(g.name) + '" placeholder="名稱">' +
+        '<div style="height:8px"></div><textarea class="fi" data-g="cue" data-i="' + i + '" rows="2" placeholder="怎麼在照片裡認出它">' + esc(g.cue) + '</textarea>' +
+        '<div style="height:8px"></div><textarea class="fi" data-g="pitch" data-i="' + i + '" rows="2" placeholder="賣點怎麼講">' + esc(g.pitch) + '</textarea>' +
+        '<div style="height:8px"></div><div class="row"><input class="fi" style="width:96px" type="number" data-g="rate" data-i="' + i + '" value="' + Math.round((Number(g.rate)||0.2)*100) + '">' +
+        '<span class="meta" style="align-self:center">% 的機率會寫到</span></div></div>';
+    });
+    h += '<div style="height:14px"></div><button class="btn" data-act="savebrand">' + (L.saved?'已儲存 ✓':'儲存設定') + '</button></div>';
+  }
+
+  if (L.open === "meet"){
+    h += '<div class="card">' + (st.meetings.length ? st.meetings.map(m =>
+      '<div class="rec"><div class="rec-t"><b>' + esc(m.q) + '</b><button class="rec-x" data-act="delmeet" data-id="' + m.id + '">刪除</button></div>' +
+      '<div class="meta">' + new Date(m.at).toLocaleString("zh-TW") + '</div><p class="say" style="margin-top:8px">' + tagged(m.conv) + '</p></div>'
+    ).join("") : '<div class="empty">還沒開過會。</div>') + '</div>';
+  }
+
+  if (L.open === "post"){
+    h += '<div class="card">' + (st.posts.length ? st.posts.map(p =>
+      '<div class="rec"><div class="rec-t"><b>' + esc(p.topic) + '</b><button class="rec-x" data-act="delpost" data-id="' + p.id + '">刪除</button></div>' +
+      '<div class="meta">' + new Date(p.at).toLocaleString("zh-TW") + ' ｜ ' + esc(p.platform) + (p.ptype?' ｜ ' + esc(p.ptype):'') + '</div>' +
+      '<div style="height:8px"></div><div class="post">' + esc(p.a) + '</div>' +
+      '<div style="height:8px"></div><button class="btn ghost sm" data-act="copypost" data-id="' + p.id + '">複製</button></div>'
+    ).join("") : '<div class="empty">還沒產過貼文。</div>') + '</div>';
+  }
+
+  if (L.open === "diag"){
+    h += '<div class="card"><h3>連線診斷</h3><div class="meta" style="margin-bottom:12px">一項一項測，看哪一種請求會被打回來。</div>' +
+      '<button class="btn" data-act="diag"' + (L.diagBusy?' disabled':'') + '>' + (L.diagBusy?'測試中…':'開始測試') + '</button>' +
+      L.diag.map(r => '<div class="rec"><div class="rec-t"><b style="color:' + (r.ok?'var(--lime)':'var(--coral)') + '">' +
+        (r.ok?'通過':'失敗') + '　' + esc(r.name) + '</b></div><div class="meta">' + esc(r.note) + '</div></div>').join("") + '</div>';
+  }
+  return h;
+}
+
+const TABS = [["post","✍️","產貼文"],["ins","📊","讀成效"],["meet","🧠","開會"],["log","📁","紀錄"]];
+
+function render(){
+  $("eyebrow").textContent = st.insights.length + " 筆數據在手";
+  $("app").innerHTML = st.tab === "post" ? viewPost() : st.tab === "ins" ? viewIns() : st.tab === "meet" ? viewMeet() : viewLog();
+  $("nav").innerHTML = TABS.map(([k,i,l]) =>
+    '<button data-tab="' + k + '" class="' + (st.tab===k?'on':'') + '"><em>' + i + '</em>' + l + '</button>').join("");
+  bind();
+}
+
+function bind(){
+  const t = $("f-topic"); if (t) t.oninput = e => st.post.topic = e.target.value;
+  const g = $("f-gist"); if (g) g.oninput = e => st.post.gist = e.target.value;
+  const q = $("m-q"); if (q) q.oninput = e => st.meet.q = e.target.value;
+  const dt = $("d-title"); if (dt) dt.oninput = e => st.ins.draft.title = e.target.value;
+  const dd = $("d-date"); if (dd) dd.oninput = e => st.ins.draft.date = e.target.value;
+
+  [["b-name","name"],["b-ig","ig"],["b-services","services"],["b-notes","notes"],["b-style","style"],["b-sample","sample"]].forEach(([id,key]) => {
+    const el = $(id); if (el) el.oninput = e => { st.brand[key] = e.target.value; };
+  });
+  const bt = $("b-tag"); if (bt) bt.oninput = e => st.brand.tagCount = Number(e.target.value) || 5;
+  document.querySelectorAll("[data-g]").forEach(el => {
+    el.oninput = e => {
+      const i = Number(el.dataset.i), k = el.dataset.g;
+      st.brand.gear[i][k] = k === "rate" ? (Number(e.target.value)||20)/100 : e.target.value;
+    };
+  });
+
+  document.querySelectorAll("[data-tab]").forEach(el => el.onclick = () => { st.tab = el.dataset.tab; render(); });
+
+  document.querySelectorAll("[data-act]").forEach(el => el.onclick = async () => {
+    const a = el.dataset.act;
+    if (a === "plat"){ st.post.platform = el.dataset.v; render(); }
+    else if (a === "ptype"){ st.post.ptype = el.dataset.v; render(); }
+    else if (a === "force"){ st.post.forceGear = !st.post.forceGear; render(); }
+    else if (a === "gen"){ runPost(); }
+    else if (a === "rewrite"){ rewritePost(); }
+    else if (a === "copy"){ copyText(st.post.out[el.dataset.k] + "\n" + st.post.out.hashtags); el.textContent = "已複製 ✓"; }
+    else if (a === "copyconv"){ copyText(st.meet.conv); el.textContent = "已複製 ✓"; }
+    else if (a === "pick"){ $("file-" + el.dataset.kind).click(); }
+    else if (a === "unpick"){
+      const k = el.dataset.kind, i = Number(el.dataset.i);
+      if (k === "post") st.post.images.splice(i,1); else st.ins.images.splice(i,1);
+      render();
+    }
+    else if (a === "readins"){ runInsight(); }
+    else if (a === "saveins"){
+      st.insights = [st.ins.draft].concat(st.insights);
+      S.set("gf:insights", st.insights);
+      st.ins.draft = null; st.ins.images = []; render();
+    }
+    else if (a === "dropins"){ st.ins.draft = null; render(); }
+    else if (a === "delins"){
+      st.insights = st.insights.filter(x => String(x.id) !== el.dataset.id);
+      S.set("gf:insights", st.insights); render();
+    }
+    else if (a === "role"){
+      const k = el.dataset.v;
+      const next = st.roleKeys.includes(k) ? st.roleKeys.filter(x => x !== k) : st.roleKeys.concat([k]);
+      if (next.length < 2){ st.meet.err = "至少要留兩個顧問。"; render(); return; }
+      st.roleKeys = next; S.set("gf:roles", next); st.meet.err = ""; render();
+    }
+    else if (a === "meet"){ runMeeting(); }
+    else if (a === "logtab"){ st.log.open = el.dataset.v; st.log.saved = false; render(); }
+    else if (a === "savebrand"){
+      S.set("gf:brand", st.brand); st.log.saved = true; render();
+      setTimeout(() => { st.log.saved = false; if (st.tab === "log") render(); }, 1800);
+    }
+    else if (a === "delmeet"){
+      st.meetings = st.meetings.filter(x => String(x.id) !== el.dataset.id);
+      S.set("gf:meetings", st.meetings); render();
+    }
+    else if (a === "delpost"){
+      st.posts = st.posts.filter(x => String(x.id) !== el.dataset.id);
+      S.set("gf:posts", st.posts); render();
+    }
+    else if (a === "copypost"){
+      const p = st.posts.find(x => String(x.id) === el.dataset.id);
+      if (p) { copyText(p.a + "\n" + p.hashtags); el.textContent = "已複製 ✓"; }
+    }
+    else if (a === "diag"){ runDiag(); }
+  });
+
+  ["post","ins"].forEach(kind => {
+    const inp = $("file-" + kind);
+    if (!inp) return;
+    inp.onchange = async e => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      const dim = kind === "ins" ? 1400 : 900;
+      const qy = kind === "ins" ? 0.82 : 0.68;
+      const max = kind === "ins" ? 2 : 3;
+      for (const f of files){
+        try {
+          const b = await fileToBlock(f, dim, qy);
+          const arr = kind === "post" ? st.post.images : st.ins.images;
+          if (arr.length < max) arr.push(b);
+        } catch(err){}
+      }
+      inp.value = "";
+      render();
+    };
+  });
+}
+
+render();
+</script>
+</body>
+</html>
