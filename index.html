@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="金魚智囊團">
+<meta name="apple-mobile-web-app-title" content="金魚貼文">
 <meta name="theme-color" content="#071D1F">
-<title>金魚智囊團</title>
+<title>金魚 IG&amp;Threads 貼文產生程式</title>
 <style>
 :root{
   --ink:#071D1F;--ink2:#0D2C2D;--ink3:#153E3D;--line:#1D5250;
@@ -23,7 +23,7 @@ body{
 }
 .wrap{max-width:680px;margin:0 auto;padding:0 16px}
 .head{padding:22px 0 14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.logo{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.logo{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
 .logo span{color:var(--gold)}
 .eyebrow{font-size:12px;letter-spacing:.12em;color:var(--mute)}
 .card{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
@@ -91,7 +91,7 @@ nav em{font-style:normal;font-size:19px;line-height:1}
 <body>
 <div class="wrap">
   <div class="head">
-    <div class="logo">金魚<span>智囊團</span></div>
+    <div class="logo">金魚<span>IG&amp;Threads</span>貼文產生程式</div>
     <div class="eyebrow" id="eyebrow"></div>
   </div>
   <div id="app"></div>
@@ -160,6 +160,13 @@ const POST_TYPES = [
     guide:`成品本身是主角。寫這首歌是誰的、寫給誰、當初卡在哪裡、現在完成了。
 結尾明確叫大家去聽完整版，不要只寫敬請期待。
 情緒放到最滿，這是慶祝，不是流程紀錄。` },
+  { key:"tip", label:"小知識", goal:"沒題材時的常備彈藥。用專業換收藏和留言，不需要任何新作品。",
+    guide:`講一件錄音或影像的實務知識，對象是完全不懂的一般人。
+不要套用「完成！！」的標準結構。開頭先丟出那個大家可能誤會或沒想過的點，再解釋。
+用比喻讓外行人聽懂，不要堆術語；真的要用術語就順手解釋一句。
+只講你確定的事，不要編數據、不要編來源、不要講絕對化的說法。
+結尾用一句問句邀請留言，或說歡迎再問，不要硬推銷。
+長度可以比一般貼文稍長，但仍然是口語，不是教學文章。` },
   { key:"voice", label:"客人的話", goal:"讓客人自己轉發。",
     guide:`客人說的話是主體，完整呈現，不要改寫成老闆的口吻。
 老闆自己的回應只佔最後兩三句，語氣是感謝，不要蓋過客人。
@@ -275,7 +282,7 @@ const st = {
   meetings: S.get("gf:meetings", []),
   posts: S.get("gf:posts", []),
   roleKeys: S.get("gf:roles", DEFAULT_ROLE_KEYS),
-  post: { topic:"", gist:"", platform:"IG", ptype:"making", forceGear:false, images:[], out:null, busy:"", err:"" },
+  post: { topic:"", gist:"", platform:"IG", ptype:"making", forceGear:false, images:[], out:null, busy:"", err:"", ideas:[], ideaBusy:false },
   ins: { images:[], draft:null, busy:"", err:"" },
   meet: { q:"", says:[], conv:"", busy:"", err:"" },
   log: { open:"brand", diag:[], diagBusy:false, saved:false }
@@ -393,6 +400,33 @@ slots 給兩個時段，具體到星期幾＋幾點幾分。`,
   }
 }
 
+async function runIdeas(){
+  const p = st.post;
+  p.ideaBusy = true; p.err = ""; render();
+  const used = st.posts.filter(x => x.ptype === "小知識").map(x => x.topic).slice(0, 30);
+  try {
+    const raw = await callClaude(
+      `你是「${st.brand.name}」的內容企劃。老闆是錄音師，今天沒題材，需要你出「小知識」的題目。
+範圍：錄音、混音、人聲、樂器收音、器材、MV 拍攝與影像的實務知識。
+要求：
+出 5 個題目，每個都要是錄音室日常真的會遇到、一般人不知道但聽了會覺得「原來如此」的事。
+只出你確定正確的內容，不要編數據、不要編來源。
+每個題目附一段兩到四句的內容大綱，用老闆自己會講的口氣寫，像他在跟客人解釋。
+題目要具體，不要「談談混音」這種空的。
+${used.length ? "不要跟這些已經寫過的重複：" + used.join("、") : ""}
+
+只輸出 JSON，不要開場白或 markdown：
+{"items":[{"t":"題目","o":"內容大綱"}]}`,
+      [{ role:"user", content:"出題。" }], 1600);
+    const r = safeJSON(raw, null);
+    if (!r || !Array.isArray(r.items) || !r.items.length) throw new Error("沒出好題目");
+    p.ideas = r.items.map(x => ({ t: x.t || "", o: x.o || "" })).filter(x => x.t);
+    p.ideaBusy = false; render();
+  } catch(e){
+    p.ideaBusy = false; p.err = "出題失敗：" + e.message + "。等幾秒再按一次。"; render();
+  }
+}
+
 async function rewritePost(){
   const p = st.post;
   if (!p.out) return;
@@ -467,7 +501,7 @@ async function runMeeting(){
     for (const r of panel){
       m.busy = r.name; render();
       const text = await callClaude(
-        `你是「${st.brand.name}」智囊團的${r.name}。
+        `你是「${st.brand.name}」顧問團的${r.name}。
 職責：${r.job}
 ${FACT_RULE}
 只講三到五點，每點一到兩句，各自獨立一行，開頭一定是【事實】或【推測】。
@@ -535,6 +569,17 @@ function viewPost(){
   h += '<label class="fl">題材</label><div class="row">' +
     POST_TYPES.map(t => '<button class="chip' + (p.ptype===t.key?' on':'') + '" data-act="ptype" data-v="' + t.key + '">' + t.label + '</button>').join("") +
     '</div><div class="meta" style="margin-top:8px">' + esc(pt.goal) + '</div>';
+  if (p.ptype === "tip"){
+    h += '<div style="height:12px"></div><button class="btn ghost sm" data-act="ideas"' + (p.ideaBusy?' disabled':'') + '>' +
+      (p.ideaBusy?'出題中…':'🎲 隨機出題') + '</button>';
+    if (p.ideaBusy) h += '<div class="load"><span class="dot"></span>正在想五個題目…</div>';
+    if (p.ideas.length){
+      h += '<div class="meta" style="margin:10px 0 6px">點一個帶進下面的欄位，帶進去之後還可以自己改。</div>';
+      h += p.ideas.map((it,i) => '<div class="slot" data-act="useidea" data-i="' + i + '" style="cursor:pointer">' +
+        '<b style="font-size:15px">' + esc(it.t) + '</b>' +
+        '<div class="meta" style="margin-top:6px">' + esc(it.o) + '</div></div>').join("");
+    }
+  }
   h += '<label class="fl">貼文主題</label><input class="fi" id="f-topic" value="' + esc(p.topic) + '" placeholder="例：新人的專屬對唱歌曲，主唱錄製完成">';
   h += '<label class="fl">內容概要</label><textarea class="fi" id="f-gist" rows="4" placeholder="越具體越好，越像你講話越好">' + esc(p.gist) + '</textarea>';
   h += '<label class="fl">貼文圖片</label>' + imagePicker("post","最多 3 張", 3);
@@ -726,6 +771,11 @@ function bind(){
     if (a === "plat"){ st.post.platform = el.dataset.v; render(); }
     else if (a === "ptype"){ st.post.ptype = el.dataset.v; render(); }
     else if (a === "force"){ st.post.forceGear = !st.post.forceGear; render(); }
+    else if (a === "ideas"){ runIdeas(); }
+    else if (a === "useidea"){
+      const it = st.post.ideas[Number(el.dataset.i)];
+      st.post.topic = it.t; st.post.gist = it.o; st.post.ideas = []; render();
+    }
     else if (a === "gen"){ runPost(); }
     else if (a === "rewrite"){ rewritePost(); }
     else if (a === "copy"){ copyText(st.post.out[el.dataset.k] + "\n" + st.post.out.hashtags); el.textContent = "已複製 ✓"; }
