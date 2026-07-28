@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="金魚貼文">
-<meta name="theme-color" content="#071D1F">
+<meta name="theme-color" content="#FAF9F6">
 <title>金魚 IG&amp;Threads 貼文產生程式</title>
 <style>
 :root{
-  --ink:#071D1F;--ink2:#0D2C2D;--ink3:#153E3D;--line:#1D5250;
-  --gold:#F5A524;--coral:#FF6B4A;--teal:#5FD6C4;--violet:#B39DFF;
-  --lime:#B8E24A;--sky:#78C6F0;--rose:#FF9EC4;
-  --txt:#EFEAE1;--mute:#87A6A3;
+  --bg:#FAF9F6;--card:#FFFFFF;--soft:#F3F1EC;--line:#E3DFD6;--line2:#D2CCC0;
+  --gold:#E0980A;--goldbg:#F5B430;--coral:#E0553A;--teal:#2E9C8A;--violet:#7C63D8;
+  --lime:#6DA023;--sky:#2F86C4;--rose:#D25A8C;
+  --txt:#1F1D1A;--mute:#77706A;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  min-height:100vh;background:var(--ink);color:var(--txt);
+  min-height:100vh;background:var(--bg);color:var(--txt);
   font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
   padding-bottom:92px;-webkit-font-smoothing:antialiased;
 }
@@ -26,31 +26,33 @@ body{
 .logo{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
 .logo span{color:var(--gold)}
 .eyebrow{font-size:12px;letter-spacing:.12em;color:var(--mute)}
-.card{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(31,29,26,.04)}
 .card h3{margin:0 0 10px;font-size:15px;font-weight:700}
 label.fl{display:block;font-size:12px;color:var(--mute);margin:12px 0 6px;letter-spacing:.04em}
 label.fl:first-child{margin-top:0}
-input.fi,textarea.fi{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;
+input.fi,textarea.fi{width:100%;background:var(--card);border:1px solid var(--line2);border-radius:10px;
   color:var(--txt);padding:11px 12px;font-size:16px;font-family:inherit;line-height:1.55}
 textarea.fi{resize:vertical}
-input.fi:focus,textarea.fi:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+input.fi:focus,textarea.fi:focus{outline:2px solid var(--goldbg);outline-offset:1px;border-color:transparent}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
-  background:var(--gold);color:#08201F;border:none;border-radius:11px;padding:14px;
+  background:var(--goldbg);color:#2B1D00;border:none;border-radius:11px;padding:14px;
   font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
 .btn:disabled{opacity:.45}
-.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+.btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--line2)}
 .btn.sm{width:auto;padding:9px 15px;font-size:13px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.chip{padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;
+.chip{padding:8px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
   color:var(--mute);font-size:13px;font-family:inherit;cursor:pointer}
-.chip.on{background:var(--gold);color:#08201F;border-color:var(--gold);font-weight:700}
+.chip.on{background:var(--goldbg);color:#2B1D00;border-color:var(--goldbg);font-weight:700}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .thumb{position:relative;width:68px;height:68px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;
-  border:none;background:rgba(7,29,31,.85);color:var(--txt);font-size:12px;cursor:pointer;line-height:1}
+  border:none;background:rgba(255,255,255,.9);color:var(--txt);font-size:12px;cursor:pointer;line-height:1;
+  box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .stamp{width:30px;height:30px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:700;color:#08201F}
+  font-size:15px;font-weight:700;color:#FFFFFF}
 .t-gold{background:var(--gold)}.t-teal{background:var(--teal)}.t-coral{background:var(--coral)}
 .t-violet{background:var(--violet)}.t-lime{background:var(--lime)}.t-sky{background:var(--sky)}.t-rose{background:var(--rose)}
 .spine{border-left:2px solid var(--line);margin-left:14px;padding-left:18px}
@@ -58,16 +60,16 @@ input.fi:focus,textarea.fi:focus{outline:2px solid var(--gold);outline-offset:1p
 .speaker b{font-size:14px}
 .say{font-size:15px;line-height:1.85;margin:0 0 18px;white-space:pre-wrap;word-break:break-word}
 .fact,.guess{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:5px;margin-right:6px}
-.fact{background:var(--gold);color:#08201F}
+.fact{background:var(--goldbg);color:#2B1D00}
 .guess{border:1px dashed var(--mute);color:var(--mute)}
-.post{background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:14px;
+.post{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px;
   font-size:15px;line-height:1.95;white-space:pre-wrap;word-break:break-word}
 .meta{font-size:12.5px;color:var(--mute);line-height:1.7}
-.slot{border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px}
+.slot{border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:8px;background:var(--soft)}
 .slot b{font-size:17px;color:var(--gold)}
-.err{background:#3A1512;border:1px solid var(--coral);color:#FFC7B9;border-radius:10px;
+.err{background:#FDECE8;border:1px solid #E9A897;color:#8A2B16;border-radius:10px;
   padding:11px 13px;font-size:13.5px;line-height:1.6;margin-bottom:12px}
-.ok{background:#123024;border:1px solid var(--lime);color:#D9F2A8;border-radius:10px;
+.ok{background:#EAF5E2;border:1px solid #A9CE85;color:#3B5C1B;border-radius:10px;
   padding:11px 13px;font-size:13.5px;line-height:1.6;margin-bottom:12px}
 .empty{color:var(--mute);font-size:13.5px;line-height:1.75;text-align:center;padding:22px 8px}
 .rec{border-bottom:1px solid var(--line);padding:12px 0}
@@ -75,16 +77,18 @@ input.fi:focus,textarea.fi:focus{outline:2px solid var(--gold);outline-offset:1p
 .rec-t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .rec-t b{font-size:14px;line-height:1.5}
 .rec-x{background:none;border:none;color:var(--mute);cursor:pointer;font-size:12px;padding:2px 4px}
-.mtag{display:inline-block;background:var(--ink3);border-radius:6px;padding:3px 8px;font-size:12.5px;margin:6px 6px 0 0}
+.mtag{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:6px;
+  padding:3px 8px;font-size:12.5px;margin:6px 6px 0 0}
 .mtag b{color:var(--gold)}
 .load{display:flex;align-items:center;gap:9px;color:var(--mute);font-size:13.5px;padding:8px 0}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:bl 1s infinite}
 @keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink2);border-top:1px solid var(--line);
-  display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
+  display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:20;
+  box-shadow:0 -1px 6px rgba(31,29,26,.05)}
 nav button{flex:1;background:none;border:none;color:var(--mute);font-family:inherit;font-size:11px;
   padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
-nav button.on{color:var(--gold)}
+nav button.on{color:var(--gold);font-weight:700}
 nav em{font-style:normal;font-size:19px;line-height:1}
 </style>
 </head>
@@ -109,6 +113,7 @@ const DEFAULT_BRAND = {
   services: "客製化歌曲、翻唱錄音製作、MV 拍攝（錄音＋MV 可一次完成）",
   notes: "2026 年 7 月啟用新攝影棚，錄音和 MV 可以在同一天一次完成。",
   tagCount: 5,
+  digestCount: 25,
   style: `語氣熱血口語，不要文青散文。
 常用雙驚嘆號「！！」、句尾「啦」「啊」「～～」、emoji 連發。
 句子不要短促標語，要有連接詞把話講完整。
@@ -263,18 +268,123 @@ function fileToBlock(file, maxDim, quality){
 function num(v){ const n = Number(String(v == null ? "" : v).replace(/[^0-9.]/g,"")); return isNaN(n) ? 0 : n; }
 function rowLine(r){
   if (r.metrics) return "・" + (r.title||"") + "｜" + (r.metrics||[]).map(x => x.label + " " + x.value).join("、");
-  return "・" + (r.title||"未命名") + "｜" + (r.when ? r.when + "｜" : "") +
-    "瀏覽 " + num(r.views) + (r.reach ? "｜觸及 " + num(r.reach) : "") +
+  return "・" + (r.title||"未命名") +
+    (r.platform || r.format ? "｜" + [r.platform, r.format].filter(Boolean).join(" ") : "") +
+    (r.when ? "｜" + r.when : "") +
+    "｜瀏覽 " + num(r.views) + (r.reach ? "｜觸及 " + num(r.reach) : "") +
     "｜讚 " + num(r.likes) + "｜留言 " + num(r.comments) + "｜分享 " + num(r.shares) +
     (r.saves ? "｜儲存 " + num(r.saves) : "") +
-    (r.fan !== undefined ? "｜粉絲佔 " + r.fan + "%" : "");
+    (r.profileVisits !== undefined
+      ? "｜個人檔案點擊 " + num(r.profileVisits) +
+        (num(r.reach) ? "（佔觸及 " + (num(r.profileVisits) / num(r.reach) * 100).toFixed(1) + "%）" : "")
+      : "") +
+    (r.newFollowers !== undefined ? "｜新增粉絲 " + num(r.newFollowers) : "") +
+    (r.fan !== undefined ? "｜非粉絲佔 " + (r.nonfan||0) + "%" : "") +
+    (r.avgWatch ? "｜平均觀看 " + r.avgWatch : "") +
+    (Array.isArray(r.src) && r.src.length ? "｜主要來源 " + r.src[0].n + " " + r.src[0].p + "%" : "");
 }
-function digest(list){
+function isRich(r){
+  return r.caption || r.fan !== undefined || r.src || r.rShare !== undefined ||
+         r.avgWatch || r.profileVisits !== undefined || r.platform;
+}
+
+function fullBlock(r){
+  const L = [];
+  const push = (label, val) => { if (val !== undefined && val !== null && val !== "") L.push(label + "：" + val); };
+  push("標題", r.title);
+  push("平台", r.platform); push("形式", r.format);
+  push("發布時間", r.when);
+  push("共同協作", r.collab); push("跨平台發佈", r.cross);
+  push("觀看次數", r.views !== undefined ? num(r.views) : undefined);
+  push("觀看拆分", (r.viewsIG !== undefined || r.viewsFB !== undefined)
+    ? "IG " + num(r.viewsIG) + "／FB " + num(r.viewsFB) : undefined);
+  push("觸及帳號數", r.reach !== undefined ? num(r.reach) : undefined);
+  push("個人檔案點擊", r.profileVisits !== undefined ? num(r.profileVisits) : undefined);
+  if (r.profileVisits !== undefined && num(r.reach))
+    push("個人檔案點擊率", (num(r.profileVisits)/num(r.reach)*100).toFixed(1) + "%");
+  push("新增粉絲", r.newFollowers !== undefined ? num(r.newFollowers) : undefined);
+  push("讚", r.likes !== undefined ? num(r.likes) : undefined);
+  push("讚拆分", (r.likesIG !== undefined || r.likesFB !== undefined)
+    ? "IG " + num(r.likesIG) + "／FB " + num(r.likesFB) : undefined);
+  push("留言", r.comments !== undefined ? num(r.comments) : undefined);
+  push("留言拆分", (r.commentsIG !== undefined || r.commentsFB !== undefined)
+    ? "IG " + num(r.commentsIG) + "／FB " + num(r.commentsFB) : undefined);
+  push("轉發", r.reposts !== undefined ? num(r.reposts) : undefined);
+  push("分享", r.shares !== undefined ? num(r.shares) : undefined);
+  push("儲存", r.saves !== undefined ? num(r.saves) : undefined);
+  push("分享率", r.rShare !== undefined ? r.rShare + "%" : undefined);
+  push("按讚率", r.rLike !== undefined ? r.rLike + "%" : undefined);
+  push("儲存率", r.rSave !== undefined ? r.rSave + "%" : undefined);
+  push("轉發率", r.rRepost !== undefined ? r.rRepost + "%" : undefined);
+  push("留言率", r.rComment !== undefined ? r.rComment + "%" : undefined);
+  push("率標高低", r.rateNote);
+  push("平均觀看時間", r.avgWatch); push("影片全長", r.vidLen); push("留存曲線", r.retention);
+  push("觀看來源", Array.isArray(r.src) ? r.src.map(x => x.n + " " + x.p + "%").join("、") : undefined);
+  push("粉絲比例", r.fan !== undefined ? "粉絲 " + r.fan + "%／非粉絲 " + (r.nonfan||0) + "%" : undefined);
+  push("年齡分佈", Array.isArray(r.ages) ? r.ages.map(x => x.n + " " + x.p + "%").join("、") : undefined);
+  push("性別分佈", r.male !== undefined ? "男 " + r.male + "%／女 " + (r.female||0) + "%" : undefined);
+  push("地區分佈", Array.isArray(r.geo) ? r.geo.map(x => x.n + " " + x.p + "%").join("、") : undefined);
+  push("輪播各張讚數", Array.isArray(r.carousel) ? r.carousel.map(x => x.n + " " + x.l).join("、") : undefined);
+  push("與一般貼文相比", r.vsAvg);
+  push("hashtag", Array.isArray(r.tags) && r.tags.length ? r.tags.map(t => "#" + t).join(" ") : undefined);
+  if (r.metrics) push("其他數字", r.metrics.map(m => m.label + " " + m.value).join("、"));
+  if (r.caption) L.push("完整文案：\n" + r.caption);
+  return L.join("\n");
+}
+
+function pickTopBottom(arr, n){
+  if (arr.length <= n) return { top: arr, bottom: [], skipped: 0 };
+  const half = Math.ceil(n / 2);
+  const top = arr.slice(0, half);
+  const bottom = arr.slice(-(n - half));
+  return { top: top, bottom: bottom, skipped: arr.length - top.length - bottom.length };
+}
+
+function digest(list, cap){
   if (!list.length) return "（目前沒有任何已存的成效數據）";
+  const N = Math.max(4, Number(cap) || 25);
+  const PLATS = ["IG", "FB", "Threads"];
   const sorted = list.slice().sort((a,b) => num(b.views) - num(a.views));
-  const top = sorted.slice(0, 30);
-  return "共 " + list.length + " 筆。以下是瀏覽數最高的 " + top.length + " 筆：\n" + top.map(rowLine).join("\n");
+
+  const richBy = {}, thinBy = {};
+  sorted.forEach(r => {
+    const pf = PLATS.indexOf(r.platform) >= 0 ? r.platform : "IG";
+    const bucket = isRich(r) ? richBy : thinBy;
+    (bucket[pf] = bucket[pf] || []).push(r);
+  });
+
+  const present = PLATS.filter(pf => (richBy[pf] && richBy[pf].length) || (thinBy[pf] && thinBy[pf].length));
+  const perRich = Math.max(4, Math.floor(N / Math.max(1, present.length)));
+  const perThin = Math.max(10, Math.floor(40 / Math.max(1, present.length)));
+
+  let out = "共 " + list.length + " 筆成效資料，涵蓋平台：" + present.join("、") + "。\n" +
+    "以下依平台分開列出。每個平台各取表現最好與最差的幾篇對照，中間的沒列出來。";
+
+  present.forEach(pf => {
+    out += "\n\n████ " + pf + " ████";
+    const rich = richBy[pf] || [];
+    if (rich.length){
+      const g = pickTopBottom(rich, perRich);
+      out += "\n\n【" + pf + "｜單則深度資料，共 " + rich.length + " 篇】";
+      out += "\n\n── " + pf + " 表現最好的 " + g.top.length + " 篇 ──\n" +
+        g.top.map((r,i) => "《" + pf + " 好 " + (i+1) + "》\n" + fullBlock(r)).join("\n\n");
+      if (g.bottom.length)
+        out += "\n\n── " + pf + " 表現最差的 " + g.bottom.length + " 篇（拿來跟上面對照找原因）──\n" +
+          g.bottom.map((r,i) => "《" + pf + " 差 " + (i+1) + "》\n" + fullBlock(r)).join("\n\n");
+      if (g.skipped) out += "\n\n（" + pf + " 中間還有 " + g.skipped + " 篇深度資料沒列出來）";
+    }
+    const thin = (thinBy[pf] || []).slice(0, perThin);
+    if (thin.length){
+      out += "\n\n【" + pf + "｜列表資料 " + thin.length + " 筆，只有基本數字，依瀏覽數排序】\n" +
+        thin.map(rowLine).join("\n");
+    }
+  });
+
+  if (present.length > 1)
+    out += "\n\n注意：不同平台的數字不能直接互相比較，觸及基準和演算法都不一樣。要比就在同一個平台內部比。";
+  return out;
 }
+
 function brandBlock(b){ return "品牌：" + b.name + "（IG：" + b.ig + "）\n服務：" + b.services + "\n補充：" + b.notes; }
 
 /* ==================== 狀態 ==================== */
@@ -286,7 +396,7 @@ const st = {
   posts: S.get("gf:posts", []),
   roleKeys: S.get("gf:roles", DEFAULT_ROLE_KEYS),
   post: { topic:"", gist:"", platform:"IG", ptype:"making", forceGear:false, images:[], out:null, busy:"", err:"", ideas:[], ideaBusy:false },
-  ins: { images:[], draft:null, busy:"", err:"", mode:"list" },
+  ins: { images:[], draft:null, busy:"", err:"", mode:"list", platform:"IG" },
   meet: { q:"", says:[], conv:"", busy:"", err:"" },
   log: { open:"brand", diag:[], diagBusy:false, saved:false }
 };
@@ -360,7 +470,7 @@ async function runPost(){
     const picked = detected.filter(g => p.forceGear || Math.random() < (Number(g.rate) || 0.2));
 
     const pt = POST_TYPES.find(t => t.key === p.ptype) || POST_TYPES[1];
-    const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights) +
+    const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights, st.brand.digestCount) +
       "\n\n「這次要發的」\n平台：" + p.platform + "\n貼文類型：" + pt.label + "\n目標：" + pt.goal +
       "\n主題：" + (p.topic || "（沒有指定，依照片判斷）") + "\n內容概要：" + (p.gist || "（沒有提供）") +
       "\n\n「照片裡有什麼」\n" + scene;
@@ -454,10 +564,32 @@ const LIST_SYS = `你是社群數據判讀員。使用者上傳的是 IG / FB / 
 t=標題，w=多久以前，v=瀏覽次數，l=讚，c=留言，s=分享。沒有的欄位就填 0。`;
 
 const ONE_SYS = `你是社群數據判讀員。這張截圖來自「單一則貼文」的洞察頁面。
-把畫面上真的看得到的數字和資訊讀出來。看不到的欄位就整個不要放進 JSON，不要填 0、不要推估。
+把畫面上真的看得到的數字和資訊全部讀出來，一個都不要漏。
+特別注意「個人檔案瀏覽次數」或「Profile visits」和「新增粉絲人數」這兩個欄位，看到一定要讀進去。
+看不到的欄位就整個不要放進 JSON，不要填 0、不要推估。百分比只寫數字，不要帶 % 符號。
+
+先判斷平台與形式：
+標題是「Reel 洞察報告」或有「用戶觀看你 Reel 的時間長度」→ pf 是 IG、fmt 是 影片
+標題是「Post insights」或「貼文洞察報告」→ pf 是 IG、fmt 是 圖片
+畫面有「用戶對你輪播廣告按讚的時機」且列出多張圖 → fmt 改成 輪播
+是 Facebook 專頁的洞察介面 → pf 是 FB
+是 Threads 的介面 → pf 是 Threads
 
 只輸出 JSON，不要開場白或 markdown：
-{"t":"貼文標題或內文第一句","d":"發布時間例如 5天前","v":觀看次數,"r":觸及的帳號數量,"l":讚,"c":留言,"rp":轉發次數,"s":分享次數,"sv":儲存次數,"pv":個人檔案瀏覽次數,"fan":粉絲百分比數字,"nonfan":非粉絲百分比數字,"age":"佔比最高的年齡層與百分比","sex":"性別分布一句話","geo":"地區分布一句話","src":"瀏覽次數主要來源一句話"}`;
+{"pf":"IG","fmt":"影片",
+"t":"標題或內文第一句","cap":"完整貼文文案含換行，只有畫面上看得到完整文案時才填","tags":["hashtag不含井號"],
+"posted":"3天前","collab":"共同協作的帳號","cross":"已多文發佈到哪裡",
+"v":觀看次數,"vIG":IG的觀看次數,"vFB":FB的觀看次數,"r":觸及的帳號數量,"pv":個人檔案瀏覽次數,"nf":新增粉絲人數,
+"l":讚,"lIG":IG的讚,"lFB":FB的讚,"c":留言,"cIG":IG留言,"cFB":FB留言,"rp":轉發次數,"sh":分享次數,"sv":儲存次數,
+"rShare":分享率,"rLike":按讚率,"rSave":儲存率,"rRepost":轉發率,"rComment":留言率,
+"rateNote":"哪些率標較高哪些標較低，一句話",
+"avgWatch":"平均觀看時間","vidLen":"影片總長度","retention":"留存曲線的形狀，一句話描述在哪裡掉最兇",
+"src":[{"n":"動態消息","p":67.2}],
+"fan":粉絲百分比,"nonfan":非粉絲百分比,
+"ages":[{"n":"18-24","p":44.9}],"male":男性百分比,"female":女性百分比,
+"geo":[{"n":"台灣","p":93.7}],
+"carousel":[{"n":"第1張","l":3}],
+"vsAvg":"跟你一般的貼文相比是高是低，一句話"}`;
 
 async function runInsight(){
   const s = st.ins;
@@ -477,8 +609,11 @@ async function runInsight(){
         else Object.keys(r).forEach(k => {
           const v = r[k];
           if (v === null || v === undefined || v === "") return;
-          if (typeof v === "number"){ if (merged[k] === undefined || v > merged[k]) merged[k] = v; }
-          else if (!merged[k]) merged[k] = v;
+          if (Array.isArray(v)){
+            if (!Array.isArray(merged[k]) || v.length > merged[k].length) merged[k] = v;
+          } else if (typeof v === "number"){
+            if (merged[k] === undefined || v > merged[k]) merged[k] = v;
+          } else if (!merged[k]) merged[k] = v;
         });
       } catch(e){ failed++; }
       await new Promise(r => setTimeout(r, 600));
@@ -486,17 +621,27 @@ async function runInsight(){
     s.busy = "";
     if (!Object.keys(merged).length){ s.err = "讀不出任何數字，換清楚一點的截圖。"; render(); return; }
     if (failed) s.err = "有 " + failed + " 張沒讀到東西，其餘已合併。";
-    s.draft = { mode:"one", platform:"IG", date:new Date().toISOString().slice(0,10), items:[{
-      title: merged.t || "未命名", when: merged.d || "",
-      views: num(merged.v), reach: num(merged.r), likes: num(merged.l), comments: num(merged.c),
-      reposts: num(merged.rp), shares: num(merged.s), saves: num(merged.sv), profileVisits: num(merged.pv),
-      fan: merged.fan, nonfan: merged.nonfan, age: merged.age, sex: merged.sex, geo: merged.geo, src: merged.src
+    s.draft = { mode:"one", platform: s.platform, date:new Date().toISOString().slice(0,10), items:[{
+      platform: s.platform, format: merged.fmt || "圖片",
+      title: merged.t || "未命名", when: merged.posted || "", caption: merged.cap || "",
+      tags: merged.tags, collab: merged.collab, cross: merged.cross,
+      views: num(merged.v), viewsIG: merged.vIG, viewsFB: merged.vFB,
+      reach: num(merged.r), profileVisits: merged.pv, newFollowers: merged.nf,
+      likes: num(merged.l), likesIG: merged.lIG, likesFB: merged.lFB,
+      comments: num(merged.c), commentsIG: merged.cIG, commentsFB: merged.cFB,
+      reposts: num(merged.rp), shares: num(merged.sh), saves: num(merged.sv),
+      rShare: merged.rShare, rLike: merged.rLike, rSave: merged.rSave,
+      rRepost: merged.rRepost, rComment: merged.rComment, rateNote: merged.rateNote,
+      avgWatch: merged.avgWatch, vidLen: merged.vidLen, retention: merged.retention,
+      src: merged.src, fan: merged.fan, nonfan: merged.nonfan,
+      ages: merged.ages, male: merged.male, female: merged.female,
+      geo: merged.geo, carousel: merged.carousel, vsAvg: merged.vsAvg
     }], dropped: 0 };
     render(); return;
   }
 
   /* 列表模式：一張讀出多則 */
-  const all = []; let platform = "IG", failed = 0;
+  const all = []; const platform = s.platform; let failed = 0;
   for (let i = 0; i < s.images.length; i++){
     s.busy = "第 " + (i+1) + " / " + s.images.length + " 張"; render();
     try {
@@ -504,9 +649,8 @@ async function runInsight(){
         [{ role:"user", content:[{type:"text",text:"讀這張截圖，每一則各一筆。"}, s.images[i].block] }], 2000);
       const r = safeJSON(raw, null);
       if (r && Array.isArray(r.items)){
-        if (r.p) platform = r.p;
         r.items.forEach(x => all.push({
-          title: x.t || "未命名", when: x.w || "",
+          platform: s.platform, title: x.t || "未命名", when: x.w || "",
           views: num(x.v), likes: num(x.l), comments: num(x.c), shares: num(x.s)
         }));
       } else failed++;
@@ -528,7 +672,7 @@ async function runMeeting(){
   if (!m.q.trim()){ m.err = "先寫下你想問的問題。"; render(); return; }
   m.err = ""; m.says = []; m.conv = "";
   const panel = ROLES.filter(r => st.roleKeys.includes(r.key));
-  const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights) + "\n\n「老闆的問題」\n" + m.q;
+  const ctx = brandBlock(st.brand) + "\n\n「已知數據」\n" + digest(st.insights, st.brand.digestCount) + "\n\n「老闆的問題」\n" + m.q;
   try {
     for (const r of panel){
       m.busy = r.name; render();
@@ -649,9 +793,43 @@ function viewPost(){
   return h;
 }
 
+function pctList(arr, top){
+  if (!Array.isArray(arr) || !arr.length) return "";
+  return arr.slice(0, top||99).map(x => esc(x.n) + " " + x.p + "%").join("、");
+}
+function detailBlock(r){
+  const rows = [];
+  if (r.platform || r.format) rows.push([r.platform, r.format].filter(Boolean).join(" ／ "));
+  if (r.viewsIG !== undefined || r.viewsFB !== undefined)
+    rows.push("觀看拆分：IG " + num(r.viewsIG) + "／FB " + num(r.viewsFB));
+  if (r.likesIG !== undefined || r.likesFB !== undefined)
+    rows.push("讚拆分：IG " + num(r.likesIG) + "／FB " + num(r.likesFB));
+  if (r.profileVisits !== undefined && num(r.reach))
+    rows.push("個人檔案點擊率 " + (num(r.profileVisits) / num(r.reach) * 100).toFixed(1) +
+      "%（" + num(r.profileVisits) + " ／ 觸及 " + num(r.reach) + "）");
+  if (r.fan !== undefined) rows.push("粉絲 " + r.fan + "%／非粉絲 " + (r.nonfan||0) + "%");
+  const rates = [["分享率",r.rShare],["按讚率",r.rLike],["儲存率",r.rSave],["轉發率",r.rRepost],["留言率",r.rComment]]
+    .filter(x => x[1] !== undefined).map(x => x[0] + " " + x[1] + "%");
+  if (rates.length) rows.push(rates.join("、"));
+  if (r.rateNote) rows.push(r.rateNote);
+  if (r.avgWatch) rows.push("平均觀看 " + r.avgWatch + (r.vidLen ? "／全長 " + r.vidLen : ""));
+  if (r.retention) rows.push("留存：" + r.retention);
+  if (r.src) rows.push("來源：" + pctList(r.src, 5));
+  if (r.ages) rows.push("年齡：" + pctList(r.ages, 7));
+  if (r.male !== undefined) rows.push("男 " + r.male + "%／女 " + (r.female||0) + "%");
+  if (r.geo) rows.push("地區：" + pctList(r.geo, 5));
+  if (r.carousel) rows.push("輪播各張讚：" + r.carousel.map(x => esc(x.n) + " " + x.l).join("、"));
+  if (r.collab) rows.push("共同協作：" + esc(r.collab));
+  if (r.cross) rows.push(esc(r.cross));
+  if (r.vsAvg) rows.push(esc(r.vsAvg));
+  if (r.tags && r.tags.length) rows.push("hashtag：" + r.tags.map(t => "#" + esc(t)).join(" "));
+  return rows.length ? '<div class="meta" style="margin-top:8px;line-height:1.9">' + rows.join("<br>") + '</div>' : "";
+}
+
 function metricTags(r){
   const f = [["瀏覽","views"],["觸及","reach"],["讚","likes"],["留言","comments"],
-             ["轉發","reposts"],["分享","shares"],["儲存","saves"],["個人檔案","profileVisits"]];
+             ["轉發","reposts"],["分享","shares"],["儲存","saves"],
+             ["個人檔案","profileVisits"],["新粉絲","newFollowers"]];
   return f.filter(([l,k]) => r[k] !== undefined && r[k] !== null)
     .map(([l,k]) => '<span class="mtag">' + l + ' <b>' + num(r[k]) + '</b></span>').join("");
 }
@@ -659,6 +837,12 @@ function metricTags(r){
 function viewIns(){
   const s = st.ins;
   let h = '<div class="card"><h3>丟後台截圖進來</h3>' +
+    '<label class="fl">這批截圖是哪個平台的</label>' +
+    '<div class="row" style="margin-bottom:12px">' +
+    ["IG","FB","Threads"].map(pf =>
+      '<button class="chip' + (s.platform===pf?' on':'') + '" data-act="insplat" data-v="' + pf + '">' + pf + '</button>').join("") +
+    '</div>' +
+    '<label class="fl">截圖類型</label>' +
     '<div class="row" style="margin-bottom:10px">' +
     '<button class="chip' + (s.mode==="list"?' on':'') + '" data-act="insmode" data-v="list">列表（多則）</button>' +
     '<button class="chip' + (s.mode==="one"?' on':'') + '" data-act="insmode" data-v="one">單則貼文</button></div>' +
@@ -681,11 +865,8 @@ function viewIns(){
       d.items.map((it,i) => '<div class="rec"><div class="rec-t"><b>' + esc(it.title) + '</b>' +
         '<button class="rec-x" data-act="dropitem" data-i="' + i + '">×</button></div>' +
         '<div class="meta">' + esc(it.when) + '</div><div>' + metricTags(it) + '</div>' +
-        (it.age||it.sex||it.geo||it.src||it.fan !== undefined
-          ? '<div class="meta" style="margin-top:8px">' +
-            (it.fan !== undefined ? '粉絲 ' + it.fan + '%／非粉絲 ' + (it.nonfan||0) + '%　' : '') +
-            (it.age ? '年齡 ' + esc(it.age) + '　' : '') + (it.sex ? esc(it.sex) + '　' : '') +
-            (it.geo ? esc(it.geo) + '　' : '') + (it.src ? esc(it.src) : '') + '</div>' : '') +
+        (it.caption ? '<div class="post" style="margin-top:8px;font-size:13.5px;line-height:1.75">' + esc(it.caption) + '</div>' : '') +
+        detailBlock(it) +
         '</div>').join("") +
       '<div style="height:16px"></div><div class="row">' +
       '<button class="btn sm" data-act="saveins">全部存起來</button>' +
@@ -701,6 +882,8 @@ function viewIns(){
     '<div class="meta">' + esc(r.when||r.date||"") + ' ｜ ' + esc(r.platform||"") + '</div><div>' +
     (r.metrics ? (r.metrics||[]).map(m => '<span class="mtag">' + esc(m.label) + ' <b>' + esc(m.value) + '</b></span>').join("")
       : metricTags(r)) +
+    detailBlock(r) +
+    (r.caption ? '<div class="meta" style="margin-top:6px">' + esc(String(r.caption).slice(0,60)) + '…</div>' : '') +
     '</div></div>').join("");
   return h + '</div>';
 }
@@ -742,6 +925,9 @@ function viewLog(){
       '<label class="fl">服務項目</label><textarea class="fi" id="b-services" rows="2">' + esc(b.services) + '</textarea>' +
       '<label class="fl">近期重點</label><textarea class="fi" id="b-notes" rows="2">' + esc(b.notes) + '</textarea>' +
       '<label class="fl">hashtag 數量</label><input class="fi" id="b-tag" type="number" value="' + esc(b.tagCount) + '">' +
+      '<label class="fl">開會時餵給顧問的深度資料筆數</label>' +
+      '<div class="meta" style="margin-bottom:6px">會取一半表現最好、一半表現最差來對照。數字越大越完整，但每場會的成本也越高。</div>' +
+      '<input class="fi" id="b-digest" type="number" value="' + esc(b.digestCount) + '">' +
       '<label class="fl">貼文語氣規則</label><textarea class="fi" id="b-style" rows="8">' + esc(b.style) + '</textarea>' +
       '<label class="fl">模仿範本</label><div class="meta" style="margin-bottom:6px">手改完一篇滿意的，就貼進來換掉舊的，文案官會越寫越像你。</div>' +
       '<textarea class="fi" id="b-sample" rows="14">' + esc(b.sample) + '</textarea>';
@@ -802,6 +988,7 @@ function bind(){
     const el = $(id); if (el) el.oninput = e => { st.brand[key] = e.target.value; };
   });
   const bt = $("b-tag"); if (bt) bt.oninput = e => st.brand.tagCount = Number(e.target.value) || 5;
+  const bd = $("b-digest"); if (bd) bd.oninput = e => st.brand.digestCount = Number(e.target.value) || 25;
   document.querySelectorAll("[data-g]").forEach(el => {
     el.oninput = e => {
       const i = Number(el.dataset.i), k = el.dataset.g;
@@ -831,6 +1018,7 @@ function bind(){
       if (k === "post") st.post.images.splice(i,1); else st.ins.images.splice(i,1);
       render();
     }
+    else if (a === "insplat"){ st.ins.platform = el.dataset.v; st.ins.draft = null; st.ins.err = ""; render(); }
     else if (a === "insmode"){ st.ins.mode = el.dataset.v; st.ins.draft = null; st.ins.err = ""; render(); }
     else if (a === "readins"){ runInsight(); }
     else if (a === "saveins"){
