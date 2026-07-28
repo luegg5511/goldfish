@@ -264,7 +264,10 @@ function num(v){ const n = Number(String(v == null ? "" : v).replace(/[^0-9.]/g,
 function rowLine(r){
   if (r.metrics) return "・" + (r.title||"") + "｜" + (r.metrics||[]).map(x => x.label + " " + x.value).join("、");
   return "・" + (r.title||"未命名") + "｜" + (r.when ? r.when + "｜" : "") +
-    "瀏覽 " + num(r.views) + "｜讚 " + num(r.likes) + "｜留言 " + num(r.comments) + "｜分享 " + num(r.shares);
+    "瀏覽 " + num(r.views) + (r.reach ? "｜觸及 " + num(r.reach) : "") +
+    "｜讚 " + num(r.likes) + "｜留言 " + num(r.comments) + "｜分享 " + num(r.shares) +
+    (r.saves ? "｜儲存 " + num(r.saves) : "") +
+    (r.fan !== undefined ? "｜粉絲佔 " + r.fan + "%" : "");
 }
 function digest(list){
   if (!list.length) return "（目前沒有任何已存的成效數據）";
@@ -283,7 +286,7 @@ const st = {
   posts: S.get("gf:posts", []),
   roleKeys: S.get("gf:roles", DEFAULT_ROLE_KEYS),
   post: { topic:"", gist:"", platform:"IG", ptype:"making", forceGear:false, images:[], out:null, busy:"", err:"", ideas:[], ideaBusy:false },
-  ins: { images:[], draft:null, busy:"", err:"" },
+  ins: { images:[], draft:null, busy:"", err:"", mode:"list" },
   meet: { q:"", says:[], conv:"", busy:"", err:"" },
   log: { open:"brand", diag:[], diagBusy:false, saved:false }
 };
@@ -441,25 +444,63 @@ async function rewritePost(){
 }
 
 /* ==================== 讀成效 ==================== */
-async function runInsight(){
-  const s = st.ins;
-  if (!s.images.length){ s.err = "先放至少一張後台截圖。"; render(); return; }
-  s.err = ""; s.draft = null;
-  const sys = `你是社群數據判讀員。使用者上傳的是 IG / FB / Threads 後台的內容列表截圖，一張裡面通常有很多則貼文或限時動態。
+const LIST_SYS = `你是社群數據判讀員。使用者上傳的是 IG / FB / Threads 後台的內容列表截圖，一張裡面通常有很多則貼文或限時動態。
 把畫面上每一則都讀出來，一則一筆。
 鐵則：只讀畫面上真的看得到的。看不清楚就跳過那一則，絕對不要推估或補值。標題被截斷就寫看得到的部分。
-為了節省長度，欄位名稱用縮寫，數字只寫阿拉伯數字（1.2萬 就寫 12000）。
+數字只寫阿拉伯數字（1.2萬 就寫 12000）。
 
 只輸出 JSON，不要開場白或 markdown：
 {"p":"IG 或 FB 或 Threads","items":[{"t":"標題","w":"50 週","v":940,"l":1,"c":0,"s":0}]}
 t=標題，w=多久以前，v=瀏覽次數，l=讚，c=留言，s=分享。沒有的欄位就填 0。`;
 
-  const all = [];
-  let platform = "IG", failed = 0;
+const ONE_SYS = `你是社群數據判讀員。這張截圖來自「單一則貼文」的洞察頁面。
+把畫面上真的看得到的數字和資訊讀出來。看不到的欄位就整個不要放進 JSON，不要填 0、不要推估。
+
+只輸出 JSON，不要開場白或 markdown：
+{"t":"貼文標題或內文第一句","d":"發布時間例如 5天前","v":觀看次數,"r":觸及的帳號數量,"l":讚,"c":留言,"rp":轉發次數,"s":分享次數,"sv":儲存次數,"pv":個人檔案瀏覽次數,"fan":粉絲百分比數字,"nonfan":非粉絲百分比數字,"age":"佔比最高的年齡層與百分比","sex":"性別分布一句話","geo":"地區分布一句話","src":"瀏覽次數主要來源一句話"}`;
+
+async function runInsight(){
+  const s = st.ins;
+  if (!s.images.length){ s.err = "先放至少一張後台截圖。"; render(); return; }
+  s.err = ""; s.draft = null;
+
+  if (s.mode === "one"){
+    /* 單則模式：每張各自讀，最後合併成同一筆 */
+    const merged = {}; let failed = 0;
+    for (let i = 0; i < s.images.length; i++){
+      s.busy = "第 " + (i+1) + " / " + s.images.length + " 張"; render();
+      try {
+        const raw = await callClaude(ONE_SYS,
+          [{ role:"user", content:[{type:"text",text:"讀這張截圖。"}, s.images[i].block] }], 1200);
+        const r = safeJSON(raw, null);
+        if (!r) { failed++; }
+        else Object.keys(r).forEach(k => {
+          const v = r[k];
+          if (v === null || v === undefined || v === "") return;
+          if (typeof v === "number"){ if (merged[k] === undefined || v > merged[k]) merged[k] = v; }
+          else if (!merged[k]) merged[k] = v;
+        });
+      } catch(e){ failed++; }
+      await new Promise(r => setTimeout(r, 600));
+    }
+    s.busy = "";
+    if (!Object.keys(merged).length){ s.err = "讀不出任何數字，換清楚一點的截圖。"; render(); return; }
+    if (failed) s.err = "有 " + failed + " 張沒讀到東西，其餘已合併。";
+    s.draft = { mode:"one", platform:"IG", date:new Date().toISOString().slice(0,10), items:[{
+      title: merged.t || "未命名", when: merged.d || "",
+      views: num(merged.v), reach: num(merged.r), likes: num(merged.l), comments: num(merged.c),
+      reposts: num(merged.rp), shares: num(merged.s), saves: num(merged.sv), profileVisits: num(merged.pv),
+      fan: merged.fan, nonfan: merged.nonfan, age: merged.age, sex: merged.sex, geo: merged.geo, src: merged.src
+    }], dropped: 0 };
+    render(); return;
+  }
+
+  /* 列表模式：一張讀出多則 */
+  const all = []; let platform = "IG", failed = 0;
   for (let i = 0; i < s.images.length; i++){
     s.busy = "第 " + (i+1) + " / " + s.images.length + " 張"; render();
     try {
-      const raw = await callClaude(sys,
+      const raw = await callClaude(LIST_SYS,
         [{ role:"user", content:[{type:"text",text:"讀這張截圖，每一則各一筆。"}, s.images[i].block] }], 2000);
       const r = safeJSON(raw, null);
       if (r && Array.isArray(r.items)){
@@ -472,21 +513,12 @@ t=標題，w=多久以前，v=瀏覽次數，l=讚，c=留言，s=分享。沒�
     } catch(e){ failed++; }
     await new Promise(r => setTimeout(r, 600));
   }
-
-  // 截圖常常上下重疊，同一則會出現兩次，這裡去掉重複的
   const seen = {}, items = [];
-  all.forEach(it => {
-    const k = it.title + "|" + it.views;
-    if (!seen[k]){ seen[k] = 1; items.push(it); }
-  });
-
+  all.forEach(it => { const k = it.title + "|" + it.views; if (!seen[k]){ seen[k]=1; items.push(it); } });
   s.busy = "";
-  if (!items.length){
-    s.err = "一則都沒讀到。列表截圖不要縮太小，數字要看得清楚。";
-    render(); return;
-  }
-  if (failed) s.err = "有 " + failed + " 張讀失敗，其餘已讀出。失敗的可以單獨再傳一次。";
-  s.draft = { platform: platform, date: new Date().toISOString().slice(0,10), items: items, dropped: all.length - items.length };
+  if (!items.length){ s.err = "一則都沒讀到。列表截圖不要縮太小，數字要看得清楚。"; render(); return; }
+  if (failed) s.err = "有 " + failed + " 張讀失敗，其餘已讀出。";
+  s.draft = { mode:"list", platform: platform, date:new Date().toISOString().slice(0,10), items: items, dropped: all.length - items.length };
   render();
 }
 
@@ -617,10 +649,24 @@ function viewPost(){
   return h;
 }
 
+function metricTags(r){
+  const f = [["瀏覽","views"],["觸及","reach"],["讚","likes"],["留言","comments"],
+             ["轉發","reposts"],["分享","shares"],["儲存","saves"],["個人檔案","profileVisits"]];
+  return f.filter(([l,k]) => r[k] !== undefined && r[k] !== null)
+    .map(([l,k]) => '<span class="mtag">' + l + ' <b>' + num(r[k]) + '</b></span>').join("");
+}
+
 function viewIns(){
   const s = st.ins;
   let h = '<div class="card"><h3>丟後台截圖進來</h3>' +
-    '<div class="meta" style="margin-bottom:12px">IG 洞察的內容列表最好用，一張可以讀出十幾則。圖片只讀不存，只留下數字。</div>' +
+    '<div class="row" style="margin-bottom:10px">' +
+    '<button class="chip' + (s.mode==="list"?' on':'') + '" data-act="insmode" data-v="list">列表（多則）</button>' +
+    '<button class="chip' + (s.mode==="one"?' on':'') + '" data-act="insmode" data-v="one">單則貼文</button></div>' +
+    '<div class="meta" style="margin-bottom:12px">' +
+    (s.mode==="one"
+      ? '同一則貼文的洞察頁，Overview、Engagement、Audience 都可以一起丟，會自動合併成一筆。'
+      : '洞察報告的內容列表，一張可以讀出十幾則。圖片只讀不存，只留下數字。') +
+    '</div>' +
     imagePicker("ins","可以一次選很多張", 10) +
     '<div style="height:16px"></div><button class="btn" data-act="readins"' + (s.busy?' disabled':'') + '>' + (s.busy?'讀取中…':'讀出數字') + '</button>';
   if (s.busy) h += '<div class="load"><span class="dot"></span>正在讀 ' + esc(s.busy) + '…</div>';
@@ -634,11 +680,13 @@ function viewIns(){
       (d.dropped ? '已自動去掉 ' + d.dropped + ' 則重複的。' : '') + '</div>' +
       d.items.map((it,i) => '<div class="rec"><div class="rec-t"><b>' + esc(it.title) + '</b>' +
         '<button class="rec-x" data-act="dropitem" data-i="' + i + '">×</button></div>' +
-        '<div class="meta">' + esc(it.when) + '</div><div>' +
-        '<span class="mtag">瀏覽 <b>' + it.views + '</b></span>' +
-        '<span class="mtag">讚 <b>' + it.likes + '</b></span>' +
-        '<span class="mtag">留言 <b>' + it.comments + '</b></span>' +
-        '<span class="mtag">分享 <b>' + it.shares + '</b></span></div></div>').join("") +
+        '<div class="meta">' + esc(it.when) + '</div><div>' + metricTags(it) + '</div>' +
+        (it.age||it.sex||it.geo||it.src||it.fan !== undefined
+          ? '<div class="meta" style="margin-top:8px">' +
+            (it.fan !== undefined ? '粉絲 ' + it.fan + '%／非粉絲 ' + (it.nonfan||0) + '%　' : '') +
+            (it.age ? '年齡 ' + esc(it.age) + '　' : '') + (it.sex ? esc(it.sex) + '　' : '') +
+            (it.geo ? esc(it.geo) + '　' : '') + (it.src ? esc(it.src) : '') + '</div>' : '') +
+        '</div>').join("") +
       '<div style="height:16px"></div><div class="row">' +
       '<button class="btn sm" data-act="saveins">全部存起來</button>' +
       '<button class="btn ghost sm" data-act="dropins">丟掉</button></div></div>';
@@ -652,10 +700,7 @@ function viewIns(){
     '<button class="rec-x" data-act="delins" data-id="' + r.id + '">刪除</button></div>' +
     '<div class="meta">' + esc(r.when||r.date||"") + ' ｜ ' + esc(r.platform||"") + '</div><div>' +
     (r.metrics ? (r.metrics||[]).map(m => '<span class="mtag">' + esc(m.label) + ' <b>' + esc(m.value) + '</b></span>').join("")
-      : '<span class="mtag">瀏覽 <b>' + num(r.views) + '</b></span>' +
-        '<span class="mtag">讚 <b>' + num(r.likes) + '</b></span>' +
-        '<span class="mtag">留言 <b>' + num(r.comments) + '</b></span>' +
-        '<span class="mtag">分享 <b>' + num(r.shares) + '</b></span>') +
+      : metricTags(r)) +
     '</div></div>').join("");
   return h + '</div>';
 }
@@ -786,6 +831,7 @@ function bind(){
       if (k === "post") st.post.images.splice(i,1); else st.ins.images.splice(i,1);
       render();
     }
+    else if (a === "insmode"){ st.ins.mode = el.dataset.v; st.ins.draft = null; st.ins.err = ""; render(); }
     else if (a === "readins"){ runInsight(); }
     else if (a === "saveins"){
       const d = st.ins.draft;
